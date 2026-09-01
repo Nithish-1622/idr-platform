@@ -1,0 +1,47 @@
+{
+    "preprocessing": {
+        "description": "Exact preprocessing pipeline to convert raw Android sensors into the (1, 10, 3) tensor required by deep_idr_model.onnx.",
+        "input_sensors": [
+            "TYPE_ACCELEROMETER (m/s\u00b2)",
+            "TYPE_GYROSCOPE (rad/s)",
+            "TYPE_GRAVITY (m/s\u00b2)"
+        ],
+        "sample_rate_hz": 10,
+        "normalization": "None. The neural network was trained on unscaled raw magnitudes.",
+        "steps": [
+            {
+                "step": 1,
+                "name": "ACC_MAG Computation",
+                "formula": "sqrt(ACC_X^2 + ACC_Y^2 + ACC_Z^2)",
+                "target_feature_index": 0
+            },
+            {
+                "step": 2,
+                "name": "GYRO_MAG Computation",
+                "formula": "sqrt(GYRO_X^2 + GYRO_Y^2 + GYRO_Z^2)",
+                "target_feature_index": 1
+            },
+            {
+                "step": 3,
+                "name": "DYN_ACC_MAG Computation",
+                "substeps": [
+                    "DYN_ACC_X = ACC_X - GRAVITY_X",
+                    "DYN_ACC_Y = ACC_Y - GRAVITY_Y",
+                    "DYN_ACC_Z = ACC_Z - GRAVITY_Z",
+                    "DYN_ACC_MAG = sqrt(DYN_ACC_X^2 + DYN_ACC_Y^2 + DYN_ACC_Z^2)"
+                ],
+                "target_feature_index": 2
+            },
+            {
+                "step": 4,
+                "name": "Window Construction",
+                "description": "Collect exactly 10 sequential timesteps (1 second at 10Hz). Concatenate features into shape (10, 3)."
+            },
+            {
+                "step": 5,
+                "name": "Batching",
+                "description": "Add a batch dimension of size 1 to produce the final tensor of shape (1, 10, 3)."
+            }
+        ]
+    }
+}
