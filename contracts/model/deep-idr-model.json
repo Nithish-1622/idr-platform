@@ -1,0 +1,63 @@
+{
+    "model": {
+        "name": "deep_idr_model",
+        "version": "1.0.0",
+        "format": "ONNX",
+        "opset": 14,
+        "purpose": "Intelligent Dead Reckoning (IDR) for predicting vehicle Velocity and Yaw Rate from smartphone IMU.",
+        "artifact_location": "ml/models/deploy/deep_idr.onnx"
+    },
+    "inference": {
+        "mode": "Sequential Sliding Window",
+        "internal_state": false,
+        "compatibility": "Compatible with standard ONNX Runtime environments (e.g., Android NNAPI, XNNPACK)."
+    },
+    "input": {
+        "tensor_name": "imu_window",
+        "tensor_shape": [1, 10, 3],
+        "datatype": "FLOAT32",
+        "batch_size": 1,
+        "window_size": 10,
+        "padding_required": true,
+        "padding_behavior": "If fewer than 10 samples are available at startup, Dev3 must pad the sequence (e.g., duplicate the first sample). The model strictly requires 10 timesteps.",
+        "features": [
+            {
+                "index": 0,
+                "name": "ACC_MAG",
+                "units": "m/s\u00b2",
+                "description": "Total magnitude of raw 3-axis accelerometer."
+            },
+            {
+                "index": 1,
+                "name": "GYRO_MAG",
+                "units": "rad/s",
+                "description": "Total magnitude of raw 3-axis gyroscope."
+            },
+            {
+                "index": 2,
+                "name": "DYN_ACC_MAG",
+                "units": "m/s\u00b2",
+                "description": "Magnitude of the dynamic acceleration (raw acceleration minus gravity)."
+            }
+        ]
+    },
+    "output": {
+        "tensor_name": "kinematics",
+        "tensor_shape": [1, 2],
+        "datatype": "FLOAT32",
+        "features": [
+            {
+                "index": 0,
+                "name": "Velocity",
+                "units": "m/s",
+                "description": "Predicted forward vehicle velocity."
+            },
+            {
+                "index": 1,
+                "name": "Yaw Rate",
+                "units": "rad/s",
+                "description": "Predicted vehicle rotation rate around the vertical axis."
+            }
+        ]
+    }
+}
