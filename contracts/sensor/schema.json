@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SensorDataRecordingContract",
+  "description": "Metadata and payload contract for selective offline sensor dataset recordings uploaded for research/debugging.",
+  "type": "object",
+  "properties": {
+    "device_id": { "type": "string", "format": "uuid" },
+    "session_id": { "type": "string", "format": "uuid" },
+    "sampling_rate_hz": { "type": "number", "minimum": 1.0 },
+    "sensors_included": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["ACCELEROMETER", "GYROSCOPE", "MAGNETOMETER", "BAROMETER", "GNSS"]
+      }
+    },
+    "duration_seconds": { "type": "number" },
+    "checksum": { "type": "string" }
+  },
+  "required": ["device_id", "session_id", "sampling_rate_hz", "sensors_included", "duration_seconds"]
+}

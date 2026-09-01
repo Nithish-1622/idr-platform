@@ -1,0 +1,111 @@
+openapi: 3.0.3
+info:
+  title: SIH-2026 Intelligent Dead Reckoning (IDR) Navigation API
+  version: 1.0.0
+  description: >
+    Main Backend API for device management, model lifecycle & ONNX distribution,
+    map package metadata, offline telemetry ingestion, OTA update manifests,
+    remote configuration, and analytics.
+
+paths:
+  /health/live:
+    get:
+      summary: Liveness probe
+      responses:
+        '200':
+          description: Service live status
+
+  /health/ready:
+    get:
+      summary: Readiness probe
+      responses:
+        '200':
+          description: DB & Redis readiness status
+
+  /api/v1/devices/register/:
+    post:
+      summary: Register mobile edge device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [device_key, platform, device_model, os_version, app_version]
+              properties:
+                device_key: { type: string }
+                platform: { type: string, enum: [ANDROID, IOS] }
+                device_model: { type: string }
+                os_version: { type: string }
+                app_version: { type: string }
+                imu_capabilities: { type: object }
+                sensor_capabilities: { type: object }
+      responses:
+        '201':
+          description: Device registered successfully
+
+  /api/v1/models/latest/:
+    get:
+      summary: Get latest active ONNX model deployment metadata
+      parameters:
+        - in: query
+          name: platform
+          schema: { type: string, enum: [ANDROID, IOS, ALL] }
+      responses:
+        '200':
+          description: Latest active model version and artifact download URL
+
+  /api/v1/telemetry/batch/:
+    post:
+      summary: Batch ingest summarized navigation states (Idempotent)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [device_id, session_id, batch_id, sequence_number, points]
+              properties:
+                device_id: { type: string, format: uuid }
+                session_id: { type: string }
+                batch_id: { type: string }
+                sequence_number: { type: integer }
+                points:
+                  type: array
+                  items:
+                    type: object
+                    required: [timestamp, latitude, longitude, confidence, navigation_mode, gnss_status]
+                    properties:
+                      timestamp: { type: string, format: date-time }
+                      latitude: { type: number }
+                      longitude: { type: number }
+                      altitude: { type: number }
+                      velocity: { type: number }
+                      heading: { type: number }
+                      confidence: { type: number }
+                      navigation_mode: { type: string }
+                      gnss_status: { type: string }
+      responses:
+        '201':
+          description: Batch ingested successfully
+        '200':
+          description: Duplicate batch ignored (Idempotent response)
+
+  /api/v1/ota/check/:
+    post:
+      summary: Check for available ONNX model and map updates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [platform, app_version]
+              properties:
+                platform: { type: string, enum: [ANDROID, IOS] }
+                app_version: { type: string }
+                current_model_version: { type: string }
+                current_map_version: { type: string }
+      responses:
+        '200':
+          description: List of compatible update manifests

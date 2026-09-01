@@ -1,0 +1,571 @@
+{
+  "info": {
+    "_postman_id": "sih-2026-idr-backend-collection",
+    "name": "SIH-2026 Intelligent Dead Reckoning (IDR) Main Backend API",
+    "description": "Complete Postman collection for testing all REST API endpoints of the SIH-2026 IDR Main Backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "base_url_root",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "device_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dataset_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "model_version_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health Checks",
+      "item": [
+        {
+          "name": "Liveness Probe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url_root}}/health/live",
+              "host": ["{{base_url_root}}"],
+              "path": ["health", "live"]
+            }
+          }
+        },
+        {
+          "name": "Readiness Probe (DB & Redis)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url_root}}/health/ready",
+              "host": ["{{base_url_root}}"],
+              "path": ["health", "ready"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Accounts & Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"lead_engineer\",\n  \"email\": \"engineer@idr.local\",\n  \"password\": \"SecurePass123!\",\n  \"role\": \"ENGINEER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register", ""]
+            }
+          }
+        },
+        {
+          "name": "Obtain JWT Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access) {",
+                  "    pm.collectionVariables.set('jwt_token', jsonData.access);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"lead_engineer\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/token/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "token", ""]
+            }
+          }
+        },
+        {
+          "name": "Refresh JWT Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"<refresh_token_here>\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/token/refresh/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "token", "refresh", ""]
+            }
+          }
+        },
+        {
+          "name": "Current User Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Devices",
+      "item": [
+        {
+          "name": "Register Mobile Device",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set('device_id', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"device_key\": \"pixel-8-pro-uuid-9999\",\n  \"platform\": \"ANDROID\",\n  \"device_model\": \"Pixel 8 Pro\",\n  \"os_version\": \"14.0\",\n  \"app_version\": \"1.0.0\",\n  \"imu_capabilities\": {\n    \"accel_hz\": 200,\n    \"gyro_hz\": 200\n  },\n  \"sensor_capabilities\": {\n    \"barometer\": true,\n    \"magnetometer\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/devices/register/",
+              "host": ["{{base_url}}"],
+              "path": ["devices", "register", ""]
+            }
+          }
+        },
+        {
+          "name": "List Registered Devices",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/devices/",
+              "host": ["{{base_url}}"],
+              "path": ["devices", ""]
+            }
+          }
+        },
+        {
+          "name": "Device Heartbeat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"app_version\": \"1.0.1\",\n  \"active_model_version\": \"1.0.0\",\n  \"active_map_version\": \"2026.01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/devices/{{device_id}}/heartbeat/",
+              "host": ["{{base_url}}"],
+              "path": ["devices", "{{device_id}}", "heartbeat", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Datasets",
+      "item": [
+        {
+          "name": "Create Dataset Metadata",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bengaluru Urban Drive Session 1\",\n  \"description\": \"100Hz IMU recording dataset in dense urban canyon\",\n  \"source\": \"Test Vehicle Alpha\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/datasets/",
+              "host": ["{{base_url}}"],
+              "path": ["datasets", ""]
+            }
+          }
+        },
+        {
+          "name": "List Datasets",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/datasets/",
+              "host": ["{{base_url}}"],
+              "path": ["datasets", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Models (ML Lifecycle)",
+      "item": [
+        {
+          "name": "Create ML Model",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"IDR_LSTM_CANYON_V1\",\n  \"model_type\": \"IDR_RECURRENT\",\n  \"description\": \"LSTM model optimized for GNSS-denied urban canyons\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/models/",
+              "host": ["{{base_url}}"],
+              "path": ["models", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Latest Active ONNX Model",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/models/latest/?platform=ANDROID",
+              "host": ["{{base_url}}"],
+              "path": ["models", "latest", ""],
+              "query": [
+                {
+                  "key": "platform",
+                  "value": "ANDROID"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Maps",
+      "item": [
+        {
+          "name": "List Map Packages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/maps/",
+              "host": ["{{base_url}}"],
+              "path": ["maps", ""]
+            }
+          }
+        },
+        {
+          "name": "Spatial Map Lookup by Lat/Lng",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/maps/lookup/?lat=12.95&lng=77.55",
+              "host": ["{{base_url}}"],
+              "path": ["maps", "lookup", ""],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "12.95"
+                },
+                {
+                  "key": "lng",
+                  "value": "77.55"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Telemetry Ingestion",
+      "item": [
+        {
+          "name": "Upload Telemetry Batch (Idempotent)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"device_id\": \"{{device_id}}\",\n  \"session_id\": \"sess-uuid-7777\",\n  \"batch_id\": \"batch-uuid-8888\",\n  \"sequence_number\": 1,\n  \"points\": [\n    {\n      \"timestamp\": \"2026-09-02T10:30:00Z\",\n      \"latitude\": 12.9716,\n      \"longitude\": 77.5946,\n      \"altitude\": 920.5,\n      \"velocity\": 5.4,\n      \"heading\": 180.0,\n      \"confidence\": 0.98,\n      \"navigation_mode\": \"AI_IDR_FUSED\",\n      \"gnss_status\": \"AVAILABLE\",\n      \"model_version\": \"1.0.0\",\n      \"map_version\": \"2026.01\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/telemetry/batch/",
+              "host": ["{{base_url}}"],
+              "path": ["telemetry", "batch", ""]
+            }
+          }
+        },
+        {
+          "name": "List Telemetry Sessions",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/telemetry/sessions/",
+              "host": ["{{base_url}}"],
+              "path": ["telemetry", "sessions", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Configurations & Sync",
+      "item": [
+        {
+          "name": "Get System Configurations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/config/",
+              "host": ["{{base_url}}"],
+              "path": ["config", ""]
+            }
+          }
+        },
+        {
+          "name": "Check Device Sync Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/config/sync/?device_key=pixel-8-pro-uuid-9999&platform=ANDROID",
+              "host": ["{{base_url}}"],
+              "path": ["config", "sync", ""],
+              "query": [
+                {
+                  "key": "device_key",
+                  "value": "pixel-8-pro-uuid-9999"
+                },
+                {
+                  "key": "platform",
+                  "value": "ANDROID"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. OTA Updates",
+      "item": [
+        {
+          "name": "Check Available OTA Updates",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"platform\": \"ANDROID\",\n  \"app_version\": \"1.0.0\",\n  \"current_model_version\": \"0.9.0\",\n  \"current_map_version\": \"2025.12\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ota/check/",
+              "host": ["{{base_url}}"],
+              "path": ["ota", "check", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Analytics",
+      "item": [
+        {
+          "name": "Get Telemetry & System Analytics Summary",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analytics/summary/",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "summary", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Model Performance Metrics",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analytics/model-performance/",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "model-performance", ""]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

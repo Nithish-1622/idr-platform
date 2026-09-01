@@ -1,0 +1,1 @@
+"""Maps domain app package."""
