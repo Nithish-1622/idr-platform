@@ -1,0 +1,1 @@
+"""Configurations domain app package."""
