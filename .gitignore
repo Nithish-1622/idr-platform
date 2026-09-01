@@ -25,5 +25,11 @@ Thumbs.db
 
 # Environment variables
 .env
+
+# -----------------------------
+# ML / Data Science Additions
+# -----------------------------
+ml/data/
+ml/models/checkpoints/*.pth
 docs/frontend_implementation_guide.md 
 
