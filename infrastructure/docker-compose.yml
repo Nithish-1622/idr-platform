@@ -7,9 +7,9 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - idr_postgres_data_v16:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d idr_backend"]
       interval: 5s
@@ -27,57 +27,5 @@ services:
       timeout: 5s
       retries: 5
 
-  backend:
-    build:
-      context: ..
-      dockerfile: infrastructure/Dockerfile
-    container_name: idr_django_backend
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - ../backend:/app/backend
-      - ../contracts:/app/contracts
-      - media_data:/app/backend/media
-    ports:
-      - "8000:8000"
-    environment:
-      - SECRET_KEY=django-insecure-sih-2026-idr-backend-super-secret-key
-      - DEBUG=True
-      - POSTGRES_DB=idr_backend
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
-      - REDIS_URL=redis://redis:6379/0
-      - ALLOWED_HOSTS=localhost,127.0.0.1,backend,0.0.0.0
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
-  celery_worker:
-    build:
-      context: ..
-      dockerfile: infrastructure/Dockerfile
-    container_name: idr_celery_worker
-    command: celery -A config worker --loglevel=info
-    volumes:
-      - ../backend:/app/backend
-      - ../contracts:/app/contracts
-      - media_data:/app/backend/media
-    environment:
-      - SECRET_KEY=django-insecure-sih-2026-idr-backend-super-secret-key
-      - DEBUG=True
-      - POSTGRES_DB=idr_backend
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
-      - REDIS_URL=redis://redis:6379/0
-    depends_on:
-      backend:
-        condition: service_started
-
 volumes:
-  postgres_data:
-  media_data:
+  idr_postgres_data_v16:
