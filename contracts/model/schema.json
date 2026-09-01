@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IDRModelContract",
+  "description": "Schema defining ONNX model metadata and input/output tensor specifications for IDR inference on mobile edge.",
+  "type": "object",
+  "properties": {
+    "model_name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "model_format": {
+      "type": "string",
+      "enum": ["ONNX", "TFLITE"]
+    },
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "tensor_shape": {
+          "type": "array",
+          "items": { "type": "integer" }
+        },
+        "features": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "sampling_frequency_hz": {
+          "type": "number"
+        }
+      },
+      "required": ["tensor_shape", "features", "sampling_frequency_hz"]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "tensor_shape": {
+          "type": "array",
+          "items": { "type": "integer" }
+        },
+        "predictions": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["tensor_shape", "predictions"]
+    },
+    "compatibility": {
+      "type": "object",
+      "properties": {
+        "min_app_version": { "type": "string" },
+        "supported_platforms": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["ANDROID", "IOS"] }
+        }
+      },
+      "required": ["min_app_version", "supported_platforms"]
+    }
+  },
+  "required": ["model_name", "version", "model_format", "input_schema", "output_schema", "compatibility"]
+}
