@@ -24,3 +24,9 @@ ignore = ["E501"]
 DJANGO_SETTINGS_MODULE = "config.settings.development"
 python_files = ["test_*.py", "*_test.py"]
 addopts = "-v --tb=short"
+
+[tool.pyright]
+venvPath = ".."
+venv = "venv"
+extraPaths = ["."]
+
