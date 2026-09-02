@@ -4,7 +4,12 @@ from pathlib import Path
 
 from decouple import Csv, config
 
+import sys
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+PROJECT_ROOT = str(BASE_DIR)
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
 SECRET_KEY = config(
     "SECRET_KEY", default="django-insecure-sih-2026-idr-backend-super-secret-key"
@@ -12,7 +17,7 @@ SECRET_KEY = config(
 
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost,testserver", cast=Csv())
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="*", cast=Csv())
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -37,6 +42,7 @@ INSTALLED_APPS = [
     "apps.ota",
     "apps.configurations",
     "apps.analytics",
+    "apps.simulations",
     "common",
 ]
 

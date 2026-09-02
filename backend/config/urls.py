@@ -8,6 +8,11 @@ from drf_spectacular.views import (
 
 from common.views import HealthLiveView, HealthReadyView
 
+from apps.simulations.views import MobileGetIMUView
+
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     # Health Checks
@@ -21,6 +26,8 @@ urlpatterns = [
         name="swagger-ui",
     ),
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    # Direct Mobile Ingestion Route
+    path("api/v1/get_imu", MobileGetIMUView.as_view(), name="mobile_get_imu"),
     # Versioned API V1 Endpoints
     path("api/v1/", include("apps.accounts.urls", namespace="accounts")),
     path("api/v1/", include("apps.devices.urls", namespace="devices")),
@@ -31,4 +38,5 @@ urlpatterns = [
     path("api/v1/", include("apps.configurations.urls", namespace="configurations")),
     path("api/v1/", include("apps.ota.urls", namespace="ota")),
     path("api/v1/", include("apps.analytics.urls", namespace="analytics")),
-]
+    path("api/v1/", include("apps.simulations.urls", namespace="simulations")),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

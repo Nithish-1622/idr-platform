@@ -29,15 +29,21 @@ def check_for_updates_service(
                 available_updates.append(
                     {
                         "payload_type": "MODEL",
+                        "model_name": mv.ml_model.name,
                         "target_version": mv.semantic_version,
+                        "model_format": artifact.format,
+                        "opset_version": mv.opset_version,
                         "artifact_url": (
                             artifact.file_path.url if artifact.file_path else ""
                         ),
+                        "contract_url": f"/api/v1/models/{mv.id}/contract/",
                         "checksum_sha256": artifact.checksum_sha256,
                         "file_size_bytes": artifact.file_size_bytes,
                         "min_app_version": mv.min_app_version,
+                        "input_shape": mv.input_schema.get("tensor_shape", [1, 10, 3]),
+                        "output_shape": mv.output_schema.get("tensor_shape", [1, 2]),
                         "is_mandatory": False,
-                        "release_notes": f"Active IDR model update v{mv.semantic_version}",
+                        "release_notes": f"Active IDR ONNX model update v{mv.semantic_version}",
                     }
                 )
 
