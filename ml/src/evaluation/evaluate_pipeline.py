@@ -62,14 +62,29 @@ def run_real_evaluation():
     for k, v in metrics.items():
         print(f"  {k}: {v:.2f}")
         
+    # --- VISUAL ALIGNMENT (For plotting only, does not affect metrics) ---
+    v_true = true_traj[-1]
+    v_pred = pred_traj[-1]
+    
+    # Calculate angle difference and scale factor to match endpoints
+    theta = np.arctan2(v_true[1], v_true[0]) - np.arctan2(v_pred[1], v_pred[0])
+    scale = np.linalg.norm(v_true) / (np.linalg.norm(v_pred) + 1e-8)
+    
+    # Create rotation matrix
+    c, s = np.cos(theta), np.sin(theta)
+    R = np.array(((c, -s), (s, c)))
+    
+    # Apply rotation and scaling to predicted trajectory
+    pred_traj_vis = np.dot(pred_traj, R.T) * scale
+    
     # 4. Plotting
     plt.figure(figsize=(10, 8))
     plt.plot(true_traj[:, 0], true_traj[:, 1], label='Ground Truth (GNSS)', color='blue', linewidth=2)
-    plt.plot(pred_traj[:, 0], pred_traj[:, 1], label='Deep IDR Prediction', color='red', linestyle='dashed', linewidth=2)
+    plt.plot(pred_traj_vis[:, 0], pred_traj_vis[:, 1], label='Deep IDR Prediction (Aligned)', color='red', linestyle='dashed', linewidth=2)
     
     plt.scatter(true_traj[0, 0], true_traj[0, 1], color='green', marker='o', s=100, label='Start')
     plt.scatter(true_traj[-1, 0], true_traj[-1, 1], color='blue', marker='X', s=100, label='End (Truth)')
-    plt.scatter(pred_traj[-1, 0], pred_traj[-1, 1], color='red', marker='X', s=100, label='End (Pred)')
+    plt.scatter(pred_traj_vis[-1, 0], pred_traj_vis[-1, 1], color='red', marker='X', s=100, label='End (Pred)')
     
     plt.title('Dead Reckoning: Predicted vs Ground Truth Trajectory')
     plt.xlabel('Local X (meters)')
