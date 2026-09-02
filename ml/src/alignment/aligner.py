@@ -87,7 +87,10 @@ class IMUAligner:
             # Fallback if PCA fails
             df_aligned['FORWARD_ACC'] = 0.0
             df_aligned['LATERAL_ACC'] = 0.0
-        # 7. Horizontal Acceleration Magnitude (Alternative Rotation-Invariant Feature)
+        # 7. Projected Yaw Rate (Yaw around Gravity axis)
+        df_aligned['PROJ_YAW'] = df_aligned[gyro_cols[0]]*nx + df_aligned[gyro_cols[1]]*ny + df_aligned[gyro_cols[2]]*nz
+        
+        # 8. Horizontal Acceleration Magnitude (Alternative Rotation-Invariant Feature)
         df_aligned['HORIZ_ACC_MAG'] = np.sqrt(df_aligned['HORIZ_ACC_X']**2 + 
                                               df_aligned['HORIZ_ACC_Y']**2 + 
                                               df_aligned['HORIZ_ACC_Z']**2)

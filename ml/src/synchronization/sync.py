@@ -29,8 +29,8 @@ class Synchronizer:
         # We will assume they started at approximately the same time for this session.
         # This is a naive alignment for unsynchronized data.
         
-        s_time_col = ' TIME SINCE START (ms)'
-        v_time_col = ' Time Since Start of Day (seconds)'
+        s_time_col = [c for c in df_s.columns if 'TIME SINCE START' in c][0]
+        v_time_col = [c for c in df_v.columns if 'Time Since Start of Day' in c][0]
         
         df_s_copy = df_s.copy()
         df_v_copy = df_v.copy()

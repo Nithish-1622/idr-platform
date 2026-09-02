@@ -29,11 +29,15 @@ class DeadReckoningEvaluator:
         trajectory = np.zeros((N, 2))
         
         x, y = 0.0, 0.0
-        heading_rad = np.deg2rad(initial_heading_deg)
+        
+        # Convert GNSS Heading (0=North, 90=East, CW) to Math ENU (0=East, 90=North, CCW)
+        math_heading_deg = (90 - initial_heading_deg) % 360
+        heading_rad = np.deg2rad(math_heading_deg)
         
         for i in range(N):
-            # Update heading
-            heading_rad += yaw_rate_rad_s[i] * self.dt
+            # Vehicle yaw rate is typically CW positive. 
+            # So a positive yaw rate (Right turn) decreases the CCW Math heading.
+            heading_rad -= yaw_rate_rad_s[i] * self.dt
             
             # Update positions (Euler integration)
             x += velocity_ms[i] * np.cos(heading_rad) * self.dt
