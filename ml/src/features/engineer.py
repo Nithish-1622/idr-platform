@@ -10,7 +10,7 @@ class FeatureEngineer:
         self.window_size = window_size
         
         # Define the base features to use (Rotation Invariant + Gravity Compensated)
-        self.feature_cols = ['ACC_MAG', 'GYRO_MAG', 'DYN_ACC_MAG']
+        self.feature_cols = ['ACC_MAG', 'PROJ_YAW', 'DYN_ACC_MAG']
         
         # Targets are dynamically found to bypass encoding issues
         self.target_base_names = ['Velocity', 'Yaw Rate']

@@ -24,6 +24,14 @@ class ONNXExporter:
         # Ensure output directory exists
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         
+        # Force UTF-8 encoding for stdout to prevent PyTorch from crashing when printing emojis (e.g., ✅)
+        import sys
+        if hasattr(sys.stdout, 'reconfigure'):
+            try:
+                sys.stdout.reconfigure(encoding='utf-8')
+            except Exception:
+                pass
+                
         print(f"Exporting model to {output_path}...")
         torch.onnx.export(
             self.model, 

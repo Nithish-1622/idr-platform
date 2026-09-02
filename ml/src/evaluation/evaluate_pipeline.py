@@ -53,8 +53,13 @@ def run_real_evaluation():
     # 3. Dead Reckoning Evaluation
     evaluator = DeadReckoningEvaluator(dt=0.1)
     
-    true_traj = evaluator.integrate_kinematics(true_vel, true_yaw)
-    pred_traj = evaluator.integrate_kinematics(pred_vel, pred_yaw)
+    # Extract initial ground truth heading (GNSS convention)
+    df_v.columns = df_v.columns.str.strip()
+    initial_heading_deg = df_v['Heading (degrees)'].iloc[0]
+    print(f"Initial GNSS Heading: {initial_heading_deg:.2f}°")
+    
+    true_traj = evaluator.integrate_kinematics(true_vel, true_yaw, initial_heading_deg=initial_heading_deg)
+    pred_traj = evaluator.integrate_kinematics(pred_vel, pred_yaw, initial_heading_deg=initial_heading_deg)
     
     metrics = evaluator.calculate_drift(pred_traj, true_traj)
     
@@ -80,7 +85,7 @@ def run_real_evaluation():
     # 4. Plotting
     plt.figure(figsize=(10, 8))
     plt.plot(true_traj[:, 0], true_traj[:, 1], label='Ground Truth (GNSS)', color='blue', linewidth=2)
-    plt.plot(pred_traj_vis[:, 0], pred_traj_vis[:, 1], label='Deep IDR Prediction (Aligned)', color='red', linestyle='dashed', linewidth=2)
+    plt.plot(pred_traj_vis[:, 0], pred_traj_vis[:, 1], label='Deep IDR Prediction (Aligned for plot)', color='red', linestyle='dashed', linewidth=2)
     
     plt.scatter(true_traj[0, 0], true_traj[0, 1], color='green', marker='o', s=100, label='Start')
     plt.scatter(true_traj[-1, 0], true_traj[-1, 1], color='blue', marker='X', s=100, label='End (Truth)')
