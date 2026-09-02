@@ -45,6 +45,11 @@ class ModelVersion(models.Model):
     input_schema = models.JSONField(default=dict)
     output_schema = models.JSONField(default=dict)
 
+    # ML Contract specifications
+    opset_version = models.IntegerField(default=14, help_text="ONNX Opset version")
+    preprocessing_spec = models.JSONField(default=dict, blank=True, help_text="Preprocessing steps from contracts/model/preprocessing.json")
+    contract_spec = models.JSONField(default=dict, blank=True, help_text="Canonical contract schema spec")
+
     release_date = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
