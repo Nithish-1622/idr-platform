@@ -32,4 +32,5 @@ Thumbs.db
 ml/data/
 ml/models/checkpoints/*.pth
 docs/frontend_implementation_guide.md 
+docs/simulation_frontend_guide.md 
 
