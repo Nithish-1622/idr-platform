@@ -24,7 +24,7 @@ class CuteColorFormatter(logging.Formatter):
         msg = super().format(record)
 
         method_map = {
-            "GET": f"{self.CYAN}{self.BOLD}🌸 GET{self.RESET}",
+            "GET": f"{self.CYAN}{self.BOLD}GET{self.RESET}",
             "POST": f"{self.PINK}{self.BOLD}🚀 POST{self.RESET}",
             "PUT": f"{self.YELLOW}{self.BOLD}⚡ PUT{self.RESET}",
             "PATCH": f"{self.PURPLE}{self.BOLD}🛠️ PATCH{self.RESET}",
@@ -68,7 +68,7 @@ class CuteColorFormatter(logging.Formatter):
             path_str = f"{self.PINK}{path}{self.RESET}"
             time_str = f"{self.DIM}[{self.formatTime(record, '%H:%M:%S')}]{self.RESET}"
 
-            return f"🌸 {time_str} {method_str} {path_str} ➔ {status_str}"
+            return f" {time_str} {method_str} {path_str} ➔ {status_str}"
 
         # Non-HTTP general log messages
         if record.levelno >= logging.ERROR:
