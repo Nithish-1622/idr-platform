@@ -127,10 +127,10 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "100/day",
-        "user": "1000/day",
-        "telemetry": "120/minute",
-        "ota": "60/minute",
+        "anon": "100000/day" if DEV_MODE else "100/day",
+        "user": "100000/day" if DEV_MODE else "1000/day",
+        "telemetry": "10000/minute" if DEV_MODE else "120/minute",
+        "ota": "6000/minute" if DEV_MODE else "60/minute",
     },
 }
 
