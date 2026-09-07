@@ -9,6 +9,7 @@ from .schema import (
     MovementMode,
     SimulationScenario,
 )
+from .sri_eshwar_outage import get_sri_eshwar_scenario
 
 
 def get_preset_scenarios() -> Dict[str, SimulationScenario]:
@@ -259,5 +260,8 @@ def get_preset_scenarios() -> Dict[str, SimulationScenario]:
         waypoints=[[0, 0], [150, 100], [100, 300], [300, 450], [200, 700]],
         gnss=GNSSConfig(frequency_hz=1.0, position_noise_meters=5.0, outages=[GNSSOutage(start_seconds=80.0, end_seconds=140.0)]),
     )
+
+    # 17. Sri Eshwar College - GPS & Internet Outage (Demonstration)
+    scenarios["sri_eshwar_outage"] = get_sri_eshwar_scenario()
 
     return scenarios
