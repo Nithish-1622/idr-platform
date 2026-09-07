@@ -40,11 +40,18 @@ class SimulationDetailView(APIView):
     @extend_schema(responses={200: SimulationRunSerializer})
     def get(self, request, pk):
         try:
-            run_obj = SimulationRun.objects.get(pk=pk)
+            try:
+                val = uuid.UUID(str(pk))
+                run_obj = SimulationRun.objects.get(pk=val)
+            except (ValueError, AttributeError):
+                run_obj = SimulationRun.objects.filter(scenario_id=str(pk)).first()
+                if not run_obj:
+                    raise SimulationRun.DoesNotExist()
+
             return Response(SimulationRunSerializer(run_obj, context={"request": request}).data)
         except SimulationRun.DoesNotExist:
             return Response(
-                {"error": {"code": "SIMULATION_NOT_FOUND", "message": "Simulation run not found."}},
+                {"error": {"code": "SIMULATION_NOT_FOUND", "message": f"Simulation run '{pk}' not found. Ensure you pass the valid UUID returned when creating the simulation."}},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -55,13 +62,20 @@ class SimulationRunTriggerView(APIView):
     @extend_schema(responses={200: SimulationRunSerializer})
     def post(self, request, pk):
         try:
-            run_obj = SimulationRun.objects.get(pk=pk)
-            run_sync = request.query_params.get("sync", "false").lower() == "true"
+            try:
+                val = uuid.UUID(str(pk))
+                run_obj = SimulationRun.objects.get(pk=val)
+            except (ValueError, AttributeError):
+                run_obj = SimulationRun.objects.filter(scenario_id=str(pk)).first()
+                if not run_obj:
+                    raise SimulationRun.DoesNotExist()
+
+            run_sync = request.query_params.get("sync", "true").lower() != "false"
             updated = trigger_simulation_job_service(run_obj, run_sync=run_sync)
             return Response(SimulationRunSerializer(updated, context={"request": request}).data)
         except SimulationRun.DoesNotExist:
             return Response(
-                {"error": {"code": "SIMULATION_NOT_FOUND", "message": "Simulation run not found."}},
+                {"error": {"code": "SIMULATION_NOT_FOUND", "message": f"Simulation run '{pk}' not found. Ensure you pass the valid UUID returned when creating the simulation."}},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
