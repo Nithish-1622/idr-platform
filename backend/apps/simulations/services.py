@@ -90,16 +90,21 @@ def create_simulation_run_service(data: Dict[str, Any]) -> SimulationRun:
     return run_obj
 
 
-def trigger_simulation_job_service(run_obj: SimulationRun, run_sync: bool = False) -> SimulationRun:
+def trigger_simulation_job_service(run_obj: SimulationRun, run_sync: bool = True) -> SimulationRun:
     run_obj.status = SimulationRun.Status.QUEUED
     run_obj.save(update_fields=["status"])
 
     if run_sync:
-        # Run synchronously for direct test/offline execution
+        # Run synchronously for direct test/offline/mobile execution
         run_simulation_job_task(str(run_obj.id))
         run_obj.refresh_from_db()
     else:
-        # Queue via Celery task queue
-        run_simulation_job_task.delay(str(run_obj.id))
+        try:
+            # Queue via Celery task queue
+            run_simulation_job_task.delay(str(run_obj.id))
+        except Exception:
+            # Fall back to synchronous execution if Celery/Redis is unavailable or throws HELLO handshake error
+            run_simulation_job_task(str(run_obj.id))
+            run_obj.refresh_from_db()
 
     return run_obj
