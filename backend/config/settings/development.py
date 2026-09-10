@@ -9,7 +9,7 @@ DB_NAME = config("POSTGRES_DB", default="idr_backend")
 DB_USER = config("POSTGRES_USER", default="postgres")
 DB_PASSWORD = config("POSTGRES_PASSWORD", default="postgres")
 DB_HOST = config("POSTGRES_HOST", default="127.0.0.1")
-DB_PORT = config("POSTGRES_PORT", default="5433")
+DB_PORT = config("POSTGRES_PORT", default="5434")
 
 USE_SQLITE_TEST = config("USE_SQLITE_TEST", default=False, cast=bool)
 
