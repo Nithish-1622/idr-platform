@@ -43,6 +43,6 @@ services:
 databases:
   - name: idr-db
     databaseName: idr_backend
-    user: postgres
+    databaseUser: idr_user
     plan: free
     region: singapore
