@@ -43,6 +43,5 @@ services:
 databases:
   - name: idr-db
     databaseName: idr_backend
-    databaseUser: idr_user
     plan: free
     region: singapore
