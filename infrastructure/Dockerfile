@@ -18,6 +18,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/ /app/backend/
 COPY contracts/ /app/contracts/
+COPY simulation/ /app/simulation/
+COPY ml/ /app/ml/
 COPY infrastructure/entrypoint.sh /app/entrypoint.sh
 
 RUN chmod +x /app/entrypoint.sh
