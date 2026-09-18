@@ -1,0 +1,48 @@
+services:
+  - type: web
+    name: idr-backend
+    runtime: docker
+    dockerfilePath: ./infrastructure/Dockerfile
+    dockerContext: .
+    plan: free
+    region: singapore # Options: oregon, frankfurt, singapore, ohio
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: "config.settings.production"
+      - key: DEBUG
+        value: "False"
+      - key: SECURE_SSL_REDIRECT
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: "*"
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: idr-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: idr-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: idr-db
+          property: password
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: idr-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: idr-db
+          property: port
+      - key: DEV_MODE
+        value: "True"
+
+databases:
+  - name: idr-db
+    databaseName: idr_backend
+    user: postgres
+    plan: free
+    region: singapore
