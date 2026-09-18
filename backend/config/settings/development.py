@@ -1,4 +1,5 @@
 import os
+from decouple import config
 from .base import *
 
 DEBUG = True
