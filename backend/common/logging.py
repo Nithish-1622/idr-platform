@@ -1,8 +1,10 @@
 import logging
 import re
-import colorama
-
-colorama.init(autoreset=True)
+try:
+    import colorama
+    colorama.init(autoreset=True)
+except ImportError:
+    pass
 
 
 class CuteColorFormatter(logging.Formatter):
