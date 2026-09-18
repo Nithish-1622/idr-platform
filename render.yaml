@@ -39,6 +39,8 @@ services:
           property: port
       - key: DEV_MODE
         value: "True"
+      - key: PORT
+        value: "8000"
 
 databases:
   - name: idr-db
