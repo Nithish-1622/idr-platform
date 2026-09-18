@@ -7,9 +7,11 @@ from decouple import Csv, config
 import sys
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-PROJECT_ROOT = str(BASE_DIR)
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
+REPO_ROOT = str(BASE_DIR.parent)
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
 SECRET_KEY = config(
     "SECRET_KEY", default="django-insecure-sih-2026-idr-backend-super-secret-key"
